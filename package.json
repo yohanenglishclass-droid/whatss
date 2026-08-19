@@ -1,0 +1,8 @@
+{
+  "name": "whatsapp-homework-checker",
+  "version": "1.0.0",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@supabase/supabase-js": "^2.48.0"
+  }
+}
