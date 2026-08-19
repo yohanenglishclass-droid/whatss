@@ -1,9 +1,6 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { createClient } = require("@supabase/supabase-js");
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-
 exports.handler = async (event) => {
   // 1. Meta Webhook Verification (GET)
   if (event.httpMethod === "GET") {
@@ -27,6 +24,17 @@ exports.handler = async (event) => {
   // 2. Incoming WhatsApp Message (POST)
   if (event.httpMethod === "POST") {
     try {
+      const supabaseUrl = process.env.SUPABASE_URL;
+      const supabaseKey = process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+      if (!supabaseUrl || !supabaseKey) {
+        console.error("Missing Supabase credentials in Environment Variables.");
+        return { statusCode: 500, body: "Server Configuration Error" };
+      }
+
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
       const body = JSON.parse(event.body || "{}");
       const message = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
