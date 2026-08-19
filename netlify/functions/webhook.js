@@ -1,4 +1,28 @@
-export async function handler(event, context) {
+export default async (req, context) => {
+  const url = new URL(req.url);
+
+  // 1. Meta Webhook Verification (GET)
+  if (req.method === 'GET') {
+    const mode = url.searchParams.get('hub.mode');
+    const token = url.searchParams.get('hub.verify_token');
+    const challenge = url.searchParams.get('hub.challenge');
+
+    if (mode === 'subscribe' && token === 'myhomeworksecret123') {
+      return new Response(challenge, {
+        status: 200,
+        headers: { 'Content-Type': 'text/plain' },
+      });
+    }
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  // 2. Incoming Messages (POST)
+  if (req.method === 'POST') {
+    return new Response('EVENT_RECEIVED', { status: 200 });
+  }
+
+  return new Response('Method Not Allowed', { status: 405 });
+};export async function handler(event, context) {
   // Grab query parameters safely
   const params = event.queryStringParameters || {};
 
